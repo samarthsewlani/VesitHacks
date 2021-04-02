@@ -1,6 +1,7 @@
 from django.db import models
 from PIL import Image
 #from vesit.models import Department
+from django import forms
 
 # Create your models here.
 class Department(models.Model):
@@ -23,6 +24,7 @@ class Student(models.Model):
     image = models.ImageField(default = "default.jpg", upload_to = 'student-profile')
 
     dept = models.ForeignKey( Department, on_delete = models.CASCADE )
+    password = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return "Student: "+ str(self.name)
@@ -48,6 +50,7 @@ class Staff(models.Model):
     eid = models.CharField(max_length=100)
     mobile_num = models.CharField(max_length=10)
     image = models.ImageField(default = "default.jpg", upload_to = 'staff-profile')
+    password = models.CharField(max_length=100, null=True)
 
     STAFF_CHOICES = (
         ('H', 'Head of Department'),
