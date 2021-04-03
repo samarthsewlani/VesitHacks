@@ -66,6 +66,11 @@ def event(request):
     return render(request, 'vesit/events.html',{'events':events})
 
 
+class EventDetailView(DetailView):
+    model = Event
+    template_name = "vesit/event_detail.html"
+    context_object_name = "event"
+
 def approve_events(request):
     if is_logged_in(request):
         level = 1

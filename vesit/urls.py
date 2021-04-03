@@ -4,13 +4,15 @@ CouncilStudentListView,
 CouncilStudentDetailView, 
 TeamStudentCreateView,
 TeamStudentListView,
-TeamStudentDetailView
+TeamStudentDetailView,
+EventDetailView
 )
 
 urlpatterns = [
     path('',home, name = 'home' ),
     path('index/',index,name='index'),
     path('create_event', create_event, name = 'create_event' ),
+    path('event/<int:pk>',EventDetailView.as_view(),name='event-detail'),
     path('events/',event,name='events'),
     path( 'approve_events', approve_events, name='approve_events' ),
     path( 'approve_level\<int:eid>\<int:approved>\<int:level>', approve_level, name='approve-level' ),
