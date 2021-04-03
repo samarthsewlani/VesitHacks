@@ -4,6 +4,6 @@ from django.contrib import admin
 #from .models import *
 from . import models
 
-myModels = [models.Institute, models.Council, models.Council_Student, models.Committee, models.Team, models.Team_Student, models.Event ]  # iterable list
+myModels = [models.Institute, models.Council, models.Council_Student, models.Committee, models.Team, models.Team_Student, models.Event, models.Dept_Allowed ]  # iterable list
 admin.site.register(myModels)
 
