@@ -63,3 +63,21 @@ class Team_Student(models.Model):
 
     def __str__(self):
         return "Committe: "+ self.team.committee.name + " , "+ self.student_type + " : "+ self.student.name
+
+
+class Event(models.Model):
+    name = models.CharField( max_length= 100 )
+    description = models.TextField( max_length= 100 )
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    choices = (
+        ('D', 'Department Level'),
+        ('I', 'Institute Level'),
+    )
+    event_type = models.CharField(max_length=1, choices=choices)
+    location = models.CharField( max_length=100 )
+    council = models.ForeignKey( Council , on_delete=models.CASCADE)
+    committee = models.ForeignKey( Committee , on_delete=models.CASCADE)
+    submitted_by = models.ForeignKey( Student, on_delete=models.CASCADE)
+    is_approved1 = models.BooleanField(default=False)
+    is_approved2 = models.BooleanField(default=False)
