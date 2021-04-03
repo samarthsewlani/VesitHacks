@@ -1,0 +1,29 @@
+{% extends 'vesit/base.html' %}
+{% load static %}
+
+{% block eventsdisplay %}
+<section id="portfolio" class="portfolio">
+  <div class="container">
+    <h2>{{ event.name }}</h2>
+
+    <p>{{ event.description }}</p>
+    <p>{{ event.start_time }}</p>
+    <p>{{ event.end_time }}</p>
+    <p>{{ event.event_type }}</p>
+    <p>{{ event.location }}</p>
+    <p>{{ event.council }}</p>
+    <p>{{ event.committee }}</p>
+    <p>{{ event.submitted_by }}</p>
+    
+    
+        <div class="btn btn-primary btn-sm portfolio-lightbox">
+                    <a href="{% url 'approve-level' event.id 1 level %}">Approve</a>
+        </div>
+        <div class="btn btn-danger btn-sm portfolio-lightbox">
+            <a href="{% url 'approve-level' event.id 0 level %}">Reject</a>
+        </div>
+        
+  </div>
+</section>
+
+{% endblock %}

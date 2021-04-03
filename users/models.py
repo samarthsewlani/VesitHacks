@@ -2,6 +2,7 @@ from django.db import models
 from PIL import Image
 #from vesit.models import Department
 from django import forms
+from django.urls import reverse
 
 # Create your models here.
 class Department(models.Model):
@@ -9,6 +10,9 @@ class Department(models.Model):
 
     def __str__(self):
         return "Department: "+self.name
+
+    def get_absolute_url(self):
+        return reverse('department-detail', kwargs={'pk': self.pk})
 
 class Student(models.Model):
     name = models.CharField( max_length=50 )
@@ -36,6 +40,9 @@ class Student(models.Model):
             output_size=(300,300)
             img=img.resize(output_size)
             img.save(self.image.path)
+
+    def get_absolute_url(self):
+        return reverse('login')
 
 
 class Staff(models.Model):

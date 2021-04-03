@@ -1,0 +1,20 @@
+{% extends "vesit/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block space %}
+<div class="container">
+    <div class="row pt-3 justify-content-center">
+        <div class="col-8 w-100">
+            <h4>Create New Account</h4>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy  }}
+                <button type="submit" class="btn btn-primary">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

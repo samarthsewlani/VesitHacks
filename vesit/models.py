@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import Student,Staff
+from users.models import Student,Staff, Department
 
 # Create your models here.
 
@@ -76,8 +76,22 @@ class Event(models.Model):
     )
     event_type = models.CharField(max_length=1, choices=choices)
     location = models.CharField( max_length=100 )
-    council = models.ForeignKey( Council , on_delete=models.CASCADE)
-    committee = models.ForeignKey( Committee , on_delete=models.CASCADE)
+    council = models.ForeignKey( Council , on_delete=models.CASCADE, null = True, blank =True)
+    committee = models.ForeignKey( Committee , on_delete=models.CASCADE, null = True, blank =True)
     submitted_by = models.ForeignKey( Student, on_delete=models.CASCADE)
-    is_approved1 = models.BooleanField(default=False)
-    is_approved2 = models.BooleanField(default=False)
+    is_approved1 = models.BooleanField(null = True, default=None)
+    is_approved2 = models.BooleanField(null = True, default=None)
+
+    def __str__(self):
+        string  = self.name+" , Organized by: "
+        if self.council:
+            string+= self.council.name+ " Council"
+
+        if self.committee:
+            string+= self.committee.name + " Committe"
+        return  string
+
+class Dept_Allowed(models.Model):
+    event_id = models.ForeignKey(Event, on_delete=models.CASCADE)
+    dept_id = models.ForeignKey(Department, on_delete=models.CASCADE)
+    is_approved = models.BooleanField( null = True, default=None )

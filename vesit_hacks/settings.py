@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'vesit.apps.VesitConfig',
     'users.apps.UsersConfig',
     'django_extensions',
+    'crispy_forms',
+    'tempus_dominus',
 
 ]
 
@@ -128,3 +130,10 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+TEMPUS_DOMINUS_LOCALIZE = True
+TEMPUS_DOMINUS_INCLUDE_ASSETS = True
+
+LOGIN_URL = 'login/'
+
+LOGIN_REDIRECT_URL = 'login/'
