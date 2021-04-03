@@ -7,9 +7,10 @@ from django.views.generic import CreateView, ListView , DetailView
 from .forms import EventCreateForm, DateForm
 import datetime
 from users.views import is_logged_in
+from django.db.models.query import QuerySet
 
 def home(request):
-    events=Event.objects.filter(is_approved2=True,is_approved1=True)
+    events=Event.objects.filter(is_approved2=True,is_approved1=True,event_type='I')
     return render( request, 'vesit/home.html' ,{'events':events})
 
 
@@ -62,8 +63,28 @@ def create_event(request):
         return redirect('login')
 
 def event(request):
-    events=Event.objects.filter(is_approved2=True,is_approved1=True)
-    return render(request, 'vesit/events.html',{'events':events})
+    events=Event.objects.filter(is_approved2=True,is_approved1=True, event_type='I')
+    if is_logged_in(request):
+        
+        user = None
+        user_id = request.session['user']['login_id']
+        if request.session['user']['type_user']=='student':
+            user = Student.objects.filter(id = user_id)[0]
+        else:
+            user = Staff.objects.filter(id = user_id)[0]
+        
+        dpt_allowed = Dept_Allowed.objects.filter(dept_id=user.dept, is_approved=True)
+        dept_events = QuerySet()
+        if dpt_allowed:
+            eids = []
+            for d in dpt_allowed:
+                eids.append(d.event_id.id)
+            print("eids",eids)
+            dept_events = Event.objects.filter(id__in=eids)
+            if dept_events:
+                events = events.union(dept_events)
+    return render(request, 'vesit/events.html',{'events':events })
+
 
 
 class EventDetailView(DetailView):
@@ -104,24 +125,32 @@ def approve_events(request):
                     events = Event.objects.filter( committee=committe, is_approved1=None )
         else:
             level = 2
-            print("2\n\n\newrfuyefrhr")
+            #print("2\n\n\newrfuyefrhr")
             if user == Principal:
                 level = 2
                 events = Event.objects.filter( council__isnull=False, is_approved1=True, is_approved2=None )
             else:
                 # for faculty head
                 committe = Committee.objects.filter(faculty_head1=user)
-                print("1\n\n\newrfuyefrhr")
                 if committe:
                     committe=committe[0]
                     level=2
                     events = Event.objects.filter( committee=committe, is_approved1=True, is_approved2=None )
                 else:
                     #for HOD
-                    pass
+                    level = 3
+                    dept = user.dept
+                    if user.staff_type =='H':
+                        event_ids = Dept_Allowed.objects.filter( dept_id=dept )
+                        
+                        eids = []
+                        for e in event_ids:
+                            eids.append(e.event_id.id)
+                        
+                        events = Event.objects.filter(id__in=eids, is_approved1=True, is_approved2=True)
         return render(request, "vesit/approve_events.html", { 'events': events, 'level':level } )   
-
     return redirect('login')
+
 
 def approve_level(request, eid,  approved, level):
     dct = {1:True, 0: False}
@@ -136,8 +165,16 @@ def approve_level(request, eid,  approved, level):
             event.is_approved2 = approved
             event.save()
         elif level==3:
-            pass
+            uid = request.session['user']['login_id']
+            user = Staff.objects.filter(id = uid  )
+            dpt_allowed = Dept_Allowed(event_id= event, dept_id= user.dept)
+            dpt_allowed.is_approved = approved
+            dpt_allowed.save()
     return redirect('approve_events')
+
+def approve_event_detail(request,event_id,level):
+    event=Event.objects.filter(id=event_id).first()
+    return render(request,'vesit/event_approve_detail.html',{'event':event,'level':level})
         
 
 class CouncilStudentCreateView(CreateView):
