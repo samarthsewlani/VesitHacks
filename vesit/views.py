@@ -2,13 +2,15 @@ from django.shortcuts import render, redirect
 from .models import Event, Council, Council_Student, Team_Student, Institute,Committee, Dept_Allowed
 from users.models import Student,Staff
 from django import forms
+from django.views.generic import CreateView, ListView , DetailView
 # Create your views here.
 from .forms import EventCreateForm, DateForm
 import datetime
 from users.views import is_logged_in
 
 def home(request):
-    return render( request, 'vesit/home.html' )
+    events=Event.objects.filter(is_approved2=True,is_approved1=True)
+    return render( request, 'vesit/home.html' ,{'events':events})
 
 
 class EventForm(forms.ModelForm):
@@ -112,11 +114,6 @@ def approve_events(request):
                 else:
                     #for HOD
                     pass
-
-
-        
-        
-        
         return render(request, "vesit/approve_events.html", { 'events': events, 'level':level } )   
 
     return redirect('login')
@@ -137,3 +134,39 @@ def approve_level(request, eid,  approved, level):
             pass
     return redirect('approve_events')
         
+
+class CouncilStudentCreateView(CreateView):
+    model = Council_Student
+    template_name = "vesit/council_student_create.html"
+    fields =['council','student','student_type']
+
+
+class CouncilStudentListView(ListView):
+    model = Council_Student
+    template_name = "vesit/council_student_list.html"
+    context_object_name = "council_students"
+    paginate_by=7
+
+class CouncilStudentDetailView(DetailView):
+    model = Council_Student
+    template_name = "vesit/council_student_detail.html"
+    context_object_name = "council_student"
+    
+
+class TeamStudentCreateView(CreateView):
+    model = Team_Student
+    template_name = "vesit/team_student_create.html"
+    fields =['team','student','student_type']
+
+class TeamStudentListView(ListView):
+    model = Team_Student
+    template_name = "vesit/team_student_list.html"
+    context_object_name = "team_students"
+    paginate_by=7
+
+class TeamStudentDetailView(DetailView):
+    model = Team_Student
+    template_name = "vesit/team_student_detail.html"
+    context_object_name = "team_student"
+
+

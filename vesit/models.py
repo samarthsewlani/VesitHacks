@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import Student,Staff, Department
+from django.urls import reverse
 
 # Create your models here.
 
@@ -30,6 +31,12 @@ class Council_Student(models.Model):
 
     def __str__(self):
         return "Council: " + self.council.name + " , " + self.student_type + " : " + self.student.name
+    
+    def get_absolute_url(self):
+        return reverse('council_student_detail', kwargs={'pk': self.pk})
+
+
+
 
 class Committee(models.Model):
     name =  models.CharField( max_length= 100 )
@@ -63,6 +70,9 @@ class Team_Student(models.Model):
 
     def __str__(self):
         return "Committe: "+ self.team.committee.name + " , "+ self.student_type + " : "+ self.student.name
+    
+    def get_absolute_url(self):
+        return reverse('team_student_detail', kwargs={'pk': self.pk})
 
 
 class Event(models.Model):
