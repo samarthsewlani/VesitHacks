@@ -43,7 +43,11 @@
                         <div class="card-body">
                             <a href="{% url 'event-detail' event.id %}" class="stretched-link"></a>
                             <h5 class="card-title">{{ event.name }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">by <a style="position: relative;" href="#" class="text-decoration-none"><strong>{{ event.commitee }} {{ event.council }}</strong></a> </h6>
+                            {% if event.committee %}
+                            <h6 class="card-subtitle mb-2 text-muted">by <a style="position: relative;" href="#" class="text-decoration-none"><strong>{{ event.committee }}</strong></a> </h6>
+                            {% else %}
+                            <h6 class="card-subtitle mb-2 text-muted">by <a style="position: relative;" href="#" class="text-decoration-none"><strong>{{ event.council }}</strong></a> </h6>
+                            {% endif %}
                             <p class="card-text">{{ event.description }}</p>
                             <p class="card-text"><small class="text-muted">{{ event.start_time }}</small></p>
                            
@@ -59,7 +63,11 @@
                         <div class="card-body">
                             <a href="{% url 'event-detail' event.id %}" class="stretched-link"></a>
                             <h5 class="card-title">{{ event.name }}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">by <a style="position: relative;" href="#" class="text-decoration-none"><strong>{{ event.commitee }} {{ event.council }}</strong></a> </h6>
+                            {% if event.committee %}
+                            <h6 class="card-subtitle mb-2 text-muted">by <a style="position: relative;" href="#" class="text-decoration-none"><strong>{{ event.committee }}</strong></a> </h6>
+                            {% else %}
+                            <h6 class="card-subtitle mb-2 text-muted">by <a style="position: relative;" href="#" class="text-decoration-none"><strong>{{ event.council }}</strong></a> </h6>
+                            {% endif %}
                             <p class="card-text">{{ event.description }}</p>
                             <p class="card-text"><small class="text-muted">{{ event.start_time }}</small></p>
                         </div>

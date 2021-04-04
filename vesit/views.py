@@ -126,7 +126,7 @@ def create_event(request):
                 event.council = council_student.council
                 
             
-            committe_student = Team_Student.objects.filter(id = sid)
+            committe_student = Team_Student.objects.filter(student = stu)
             if committe_student:
                 committe_student=committe_student[0]
                 event.committee = committe_student.team.committee
@@ -224,10 +224,11 @@ def approve_events(request):
                     level = 3
                     dept = user.dept
                     if user.staff_type =='H':
-                        event_ids = Dept_Allowed.objects.filter( dept_id=dept )
+                        event_ids = Dept_Allowed.objects.filter( dept_id=dept,is_approved=None )
                         
                         eids = []
                         for e in event_ids:
+                            print(e)
                             eids.append(e.event_id.id)
                         
                         events = Event.objects.filter(id__in=eids, is_approved1=True, is_approved2=True)
@@ -251,9 +252,10 @@ def approve_level(request, eid,  approved, level):
         elif level==3:
             uid = request.session['user']['login_id']
             user = Staff.objects.filter(id = uid  )
-            dpt_allowed = Dept_Allowed(event_id= event, dept_id= user.dept)
-            dpt_allowed.is_approved = approved
-            dpt_allowed.save()
+            user=user[0]
+            dept_allowed = Dept_Allowed.objects.filter(event_id=event,dept_id=user.dept).first()
+            dept_allowed.is_approved = approved
+            dept_allowed.save()
     return redirect('approve_events')
 
 def approve_event_detail(request,event_id,level):
