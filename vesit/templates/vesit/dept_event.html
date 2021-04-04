@@ -1,0 +1,22 @@
+{% extends "vesit/base.html" %} {% load crispy_forms_tags %} {% block home %}
+<div class="container">
+    <div class="row pt-3 justify-content-center border">
+        <div class="col-8 w-100">
+            <fieldset class="form-group">
+            <legend class= "border-bottom  mb-4">Add Departments for the event </legend>
+            </fieldset>
+            <form method="POST">
+                <input type="hidden" name="event_id" value="{{event_id}}" />
+                {% csrf_token %} 
+                {{ form.media }} 
+                {{ form| crispy }}
+                <br>
+                <button type="submit" class="btn btn-primary">
+                    Add Depts
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

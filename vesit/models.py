@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import Student,Staff, Department
 from django.urls import reverse
+from django.utils import timezone
+
 
 # Create your models here.
 
@@ -100,8 +102,25 @@ class Event(models.Model):
         if self.committee:
             string+= self.committee.name + " Committe"
         return  string
+    
+"""    @property
+    def is_upcoming_event(self):
+        print("upcomng call")
+        now = timezone.localtime(timezone.now())
+        print(now,self.start_time,self.start_time > now,self.name)
+        return self.start_time > now
+
+    @property
+    def is_present_event(self):
+        print("caling")
+        now = timezone.localtime(timezone.now())
+        print(now,self.start_time,self.start_time <= now and now >= self.end_time,self.name)
+        return self.start_time <= now and now >= self.end_time"""
 
 class Dept_Allowed(models.Model):
     event_id = models.ForeignKey(Event, on_delete=models.CASCADE)
     dept_id = models.ForeignKey(Department, on_delete=models.CASCADE)
     is_approved = models.BooleanField( null = True, default=None )
+
+    def get_absolute_url(self):
+        return reverse('home')

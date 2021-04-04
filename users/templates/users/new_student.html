@@ -9,9 +9,13 @@
             <form method="POST">
                 {% csrf_token %}
                 {{ form|crispy  }}
-                <button type="submit" class="btn btn-primary">
-                    Create Account
-                </button>
+                Password:
+                <input type="password" name="pass">
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        Create Account
+                    </button>
+                </div>
             </form>
         </div>
     </div>

@@ -1,17 +1,77 @@
 from django.shortcuts import render, redirect
 from .models import Event, Council, Council_Student, Team_Student, Institute,Committee, Dept_Allowed
-from users.models import Student,Staff
+from users.models import Student,Staff,Department
 from django import forms
 from django.views.generic import CreateView, ListView , DetailView
 # Create your views here.
-from .forms import EventCreateForm, DateForm
+from .forms import EventCreateForm, DateForm, DeptEventForm
 import datetime
 from users.views import is_logged_in
 from django.db.models.query import QuerySet
 
+
+def is_present_event(event):
+    now=datetime.datetime.now()
+    st=event.start_time
+    start_time=datetime.datetime(st.year,st.month,st.day,st.hour,st.minute,st.second)
+    et=event.end_time
+    end_time=datetime.datetime(et.year,et.month,et.day,et.hour,et.minute,et.second)
+    #print(start_time.hour,start_time.month)
+    #print(now,start_time,type(now),type(start_time))
+    if start_time<=now and end_time>now:
+        return True
+    return False
+
+def is_upcoming_event(event):
+    now=datetime.datetime.now()
+    st=event.start_time
+    start_time=datetime.datetime(st.year,st.month,st.day,st.hour,st.minute,st.second)
+    et=event.end_time
+    end_time=datetime.datetime(et.year,et.month,et.day,et.hour,et.minute,et.second)
+    if start_time>now:
+        return True
+    return False
+
 def home(request):
-    events=Event.objects.filter(is_approved2=True,is_approved1=True,event_type='I')
-    return render( request, 'vesit/home.html' ,{'events':events})
+    if is_logged_in(request):
+        events=Event.objects.filter(is_approved2=True,is_approved1=True,event_type='I')
+        user = None
+        user_id = request.session['user']['login_id']
+        if request.session['user']['type_user']=='student':
+            user = Student.objects.filter(id = user_id)[0]
+        else:
+            user = Staff.objects.filter(id = user_id)[0]
+        
+        dpt_allowed = Dept_Allowed.objects.filter(dept_id=user.dept, is_approved=True)
+        dept_events = QuerySet()
+        if dpt_allowed:
+            eids = []
+            for d in dpt_allowed:
+                eids.append(d.event_id.id)
+            print("eids",eids)
+            dept_events = Event.objects.filter(id__in=eids)
+            if dept_events:
+                events = events.union(dept_events)
+    else:
+        events=Event.objects.filter(is_approved2=True,is_approved1=True,event_type='I')
+        qs=Dept_Allowed.objects.filter(is_approved=True)
+        print(qs)
+        dept_events=set()
+        for i in qs:
+            print(i.event_id)
+            dept_events.add(i.event_id)
+        dept_events=list(dept_events)
+        events=list(events)
+        print(events,dept_events)
+        events+=dept_events
+        print(events)
+    present_events,upcoming_events=[],[]
+    for i in events:
+        if is_present_event(i):
+            present_events.append(i)
+        elif is_upcoming_event(i):
+            upcoming_events.append(i)
+    return render( request, 'vesit/home.html' ,{'present_events':present_events,'upcoming_events':upcoming_events})
 
 
 class EventForm(forms.ModelForm):
@@ -24,9 +84,25 @@ def index(request):
     return render(request, 'vesit/index.html',{'event_form':event_form})
 
 
+
 def create_event(request):
+    print("FUNCTION CALLING")
     if is_logged_in(request):
         if request.method == "POST":
+            if request.POST.get('name',"NEWFORM")=="NEWFORM":
+                depts=request.POST.getlist('departments')
+                print(request.POST.getlist('departments'))
+                print(type(request.POST.getlist('departments')))
+                event_id=request.POST.get('event_id')
+                event=Event.objects.filter(id=event_id).first()
+                print(depts,type(depts))
+                for dept_id in depts:
+                    dept=Department.objects.filter(id=dept_id).first()
+                    print(dept,event)
+                    obj=Dept_Allowed(dept_id=dept,event_id=event)
+                    obj.save()
+                return redirect('event-detail',event_id)
+
             date = request.POST['start_date']
             start_date = datetime.datetime.strptime(date, '%m/%d/%Y %I:%M:%S %p')
             date = request.POST['end_date']
@@ -58,9 +134,16 @@ def create_event(request):
             print(event)
             
             event.save()
+            if event.event_type=="D":
+                deptform=DeptEventForm()
+                return render(request,'vesit/dept_event.html',{'event_id':event.id,'form':deptform})
         return render(request, 'vesit/create_event.html', {'form': DateForm(), 'event_form': EventCreateForm })
     else:
         return redirect('login')
+
+def add_dept_to_event(request,**kwargs):
+    print(**kwargs)
+    return render(request,'vesit/home.html')
 
 def event(request):
     events=Event.objects.filter(is_approved2=True,is_approved1=True, event_type='I')
@@ -160,6 +243,7 @@ def approve_level(request, eid,  approved, level):
         event = event[0]
         if level == 1:
             event.is_approved1 = approved
+            print("APPROVED LEVEL 1",event.is_approved1)
             event.save()
         elif level==2:
             event.is_approved2 = approved
